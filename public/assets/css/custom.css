@@ -1,0 +1,42 @@
+.menu-item.active .menu-link {
+    box-shadow : none !important;
+}
+
+.chosen-container {
+    width : 100% !important;
+}
+
+.chosen-container-single .chosen-default, .chosen-container-single .chosen-single {
+    color           : #6f6b7d;
+    background      : #fff;
+    height          : 38px;
+    border-color    : #c9c8ce;
+    box-shadow      : none;
+    display         : flex;
+    justify-content : start;
+    align-items     : center;
+}
+
+.chosen-container-single .chosen-default div, .chosen-container-single .chosen-single div {
+    top : 20%;
+}
+
+.chosen-container-multi .chosen-choices {
+    color           : #6f6b7d;
+    background      : #fff;
+    height          : 38px;
+    border-color    : #c9c8ce;
+    box-shadow      : none;
+    display         : flex;
+    justify-content : start;
+    align-items     : center;
+    border-radius   : 4px;
+}
+
+.dz-message:before {
+    top : calc(50% + 23px);
+}
+
+.chosen-container-single .chosen-single abbr {
+    top : 13px !important;
+}
