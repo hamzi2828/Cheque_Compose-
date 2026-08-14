@@ -95,10 +95,10 @@
 </div>
 
 <div class="row mb-3">
-    <label class="col-sm-2 col-form-label" for="fraction">Fraction</label>
+    <label class="col-sm-2 col-form-label" for="bank_account_number">Bank Account Number</label>
     <div class="col-sm-10">
-        <input type="text" class="form-control" id="fraction" name="fraction"
-               value="{{ old('fraction', $bank->fraction ?? '') }}" />
+        <input type="text" class="form-control" id="bank_account_number" name="bank_account_number"
+               value="{{ old('bank_account_number', $bank->bank_account_number ?? '') }}" />
     </div>
 </div>
 

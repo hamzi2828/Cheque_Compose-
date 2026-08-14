@@ -9,6 +9,7 @@ class Cheque extends Model
 {
     protected $fillable = [
         'client_id',
+        'payee_id',
         'bank_id',
         'bank_cheque_sequence_id',
         'cheque_number',
@@ -25,6 +26,11 @@ class Cheque extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function payee(): BelongsTo
+    {
+        return $this->belongsTo(Payee::class);
     }
 
     public function bank(): BelongsTo

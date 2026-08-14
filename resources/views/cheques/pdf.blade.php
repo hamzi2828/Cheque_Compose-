@@ -2,6 +2,7 @@
     /** @var \App\Models\Cheque $cheque */
     $client = $cheque->client;
     $bank   = $cheque->bank;
+    $payee  = $cheque->payee;
 
     $chequeNo = (string) $cheque->cheque_number;
     $amount   = '$' . number_format((float) $cheque->amount, 2);
@@ -12,7 +13,7 @@
 
     // MICR E-13B line (micrenc font): C = on-us, A = transit.
     // Cheque number gets two leading zeros, e.g. 1709 -> 001709.
-    $micr = 'C00' . $chequeNo . 'C  A' . $bank->routing_number . 'A  ' . ($client->bank_account_number ?: '') . 'C';
+    $micr = 'C00' . $chequeNo . 'C  A' . $bank->routing_number . 'A  ' . ($bank->bank_account_number ?: '') . 'C';
 
     $clientCityLine = trim(implode(', ', array_filter([$client->city, $client->state])) . ' ' . $client->zip_code);
     $bankCityLine   = trim(implode(', ', array_filter([$bank->city, $bank->state])) . ' ' . $bank->zip_code);
@@ -129,8 +130,8 @@
                 </td>
                 <td width="22%">
                     <div class="cheque-no">{{ $chequeNo }}</div>
-                    @if($bank->fraction)
-                        <div class="fraction">{{ $bank->fraction }}</div>
+                    @if($bank->bank_account_number)
+                        <div class="fraction">{{ $bank->bank_account_number }}</div>
                     @endif
                     <div class="cheque-date">{{ $cheque->cheque_date->format('m/d/Y') }}</div>
                 </td>
@@ -140,7 +141,7 @@
         <!-- Payee -->
         <div class="pay-line">
             <span class="pay-label">Pay To The Order Of:</span>&nbsp;&nbsp;
-            <span class="payee-name">{{ $client->payee_name }}</span>
+            <span class="payee-name">{{ $payee?->name }}</span>
         </div>
 
         <!-- Amount in words + figures on one underlined line -->
@@ -159,7 +160,7 @@
                     <td width="48%"></td>
                     <td width="52%" class="auth-text">
                         Payment authorized by accountholder. Indemnification
-                        agreement provided by:&nbsp; {{ $client->payee_name }}<br>
+                        agreement provided by:&nbsp; {{ $payee?->name }}<br>
                         <span class="auth-signature">Signature Not Required Per Agreement</span>
                     </td>
                 </tr>

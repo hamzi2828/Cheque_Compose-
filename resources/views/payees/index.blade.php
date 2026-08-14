@@ -10,38 +10,27 @@
                 <table class="datatables-users table" id="datatable">
                     <thead class="border-top">
                         <tr>
-                            <th>Cheque #</th>
-                            <th>Date</th>
-                            <th>Company</th>
-                            <th>Payee</th>
-                            <th>Bank</th>
-                            <th>Amount</th>
-                            <th>Memo</th>
+                            <th>Sr. No.</th>
+                            <th>Payee Name</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($cheques as $cheque)
+                        @foreach($payees as $payee)
                             <tr>
-                                <td>{{ $cheque->cheque_number }}</td>
-                                <td>{{ $cheque->cheque_date->format('m/d/Y') }}</td>
-                                <td>{{ $cheque->client?->company_name }}</td>
-                                <td>{{ $cheque->payee?->name }}</td>
-                                <td>{{ $cheque->bank?->bank_name }}</td>
-                                <td>${{ number_format((float) $cheque->amount, 2) }}</td>
-                                <td>{{ $cheque->memo }}</td>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $payee->name }}</td>
                                 <td>
                                     <div class="d-flex align-items-center" style="min-width: 100px">
-                                        <a href="{{ route ('cheques.pdf', ['cheque' => $cheque]) }}"
-                                            target="_blank"
+                                        <a href="{{ route ('payees.edit', ['payee' => $payee]) }}"
                                             class="text-body" data-bs-toggle="tooltip"
                                             data-bs-placement="top"
                                             data-bs-custom-class="tooltip-primary"
-                                            title="Download PDF">
-                                            <i class="ti ti-printer ti-sm me-2"></i>
+                                            title="Edit">
+                                            <i class="ti ti-edit ti-sm me-2"></i>
                                         </a>
-                                        <form method="post" id="delete-record-form-{{ $cheque -> id }}"
-                                            action="{{ route ('cheques.destroy', ['cheque' => $cheque]) }}">
+                                        <form method="post" id="delete-record-form-{{ $payee -> id }}"
+                                            action="{{ route ('payees.destroy', ['payee' => $payee]) }}">
                                             @method('DELETE')
                                             @csrf
                                             <button type="button" data-bs-toggle="tooltip"
@@ -49,7 +38,7 @@
                                                     data-bs-custom-class="tooltip-danger"
                                                     title="Delete"
                                                     class="text-body delete-record bg-transparent border-0 p-0"
-                                                    onclick="delete_confirmation({{ $cheque -> id }})">
+                                                    onclick="delete_confirmation({{ $payee -> id }})">
                                                 <i class="ti ti-trash ti-sm mx-2"></i>
                                             </button>
                                         </form>
@@ -65,7 +54,7 @@
     <!-- / Content -->
     @push('scripts')
         <script type="text/javascript">
-            init_datatable ( '{{ route ('cheques.create') }}' )
+            init_datatable ( '{{ route ('payees.create') }}' )
         </script>
     @endpush
 </x-dashboard>

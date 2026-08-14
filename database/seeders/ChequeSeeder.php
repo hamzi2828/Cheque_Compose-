@@ -5,12 +5,23 @@ namespace Database\Seeders;
 use App\Models\Bank;
 use App\Models\Cheque;
 use App\Models\Client;
+use App\Models\Payee;
 use Illuminate\Database\Seeder;
 
 class ChequeSeeder extends Seeder
 {
     public function run(): void
     {
+        // The payee each demo company usually pays to.
+        $payeeByCompany = [
+            'Acme Logistics LLC'            => 'Acme Logistics LLC',
+            'Brightside Media Group'        => 'Brightside Media Group',
+            'Cedar Valley Farms'            => 'Cedar Valley Farms Inc.',
+            'Delta Office Supplies'         => 'Delta Office Supplies',
+            'Evergreen Property Management' => 'Evergreen Property Management',
+            'Fairview Consulting'           => 'Fairview Consulting Ltd.',
+        ];
+
         // [routing_number, company_name, cheque_number, date, memo, amount]
         $cheques = [
             ['071000505', 'Acme Logistics LLC',            1001, '2026-07-01', 'Freight services - June',        1250.00],
@@ -33,6 +44,7 @@ class ChequeSeeder extends Seeder
         foreach ($cheques as [$routing, $company, $number, $date, $memo, $amount]) {
             $bank   = Bank::where('routing_number', $routing)->first();
             $client = Client::where('company_name', $company)->first();
+            $payee  = Payee::where('name', $payeeByCompany[$company] ?? null)->first();
 
             if (! $bank || ! $client) {
                 continue;
@@ -47,6 +59,7 @@ class ChequeSeeder extends Seeder
                 ['bank_id' => $bank->id, 'cheque_number' => $number],
                 [
                     'client_id'               => $client->id,
+                    'payee_id'                => $payee?->id,
                     'bank_cheque_sequence_id' => $sequence?->id,
                     'cheque_date'             => $date,
                     'memo'                    => $memo,

@@ -12,12 +12,10 @@
                         <tr>
                             <th>Sr. No.</th>
                             <th>Company Name</th>
-                            <th>Payee</th>
                             <th>Contact No.</th>
                             <th>Email</th>
                             <th>City</th>
-                            <th>Client Bank</th>
-                            <th>Account #</th>
+                            <th>Banks</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -26,12 +24,10 @@
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $client->company_name }}</td>
-                                <td>{{ $client->payee_name }}</td>
                                 <td>{{ $client->contact_no }}</td>
                                 <td>{{ $client->email }}</td>
                                 <td>{{ $client->city }}</td>
-                                <td>{{ $client->bank?->bank_name ?? 'N/A' }}</td>
-                                <td>{{ $client->bank_account_number }}</td>
+                                <td>{{ $client->banks->pluck('bank_name')->implode(', ') ?: 'N/A' }}</td>
                                 <td>
                                     <div class="d-flex align-items-center" style="min-width: 100px">
                                         <a href="{{ route ('clients.edit', ['client' => $client]) }}"

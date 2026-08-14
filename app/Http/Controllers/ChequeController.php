@@ -6,6 +6,7 @@ use App\Models\Bank;
 use App\Models\BankChequeSequence;
 use App\Models\Cheque;
 use App\Models\Client;
+use App\Models\Payee;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,28 +19,49 @@ class ChequeController extends Controller
     {
         return view('cheques.index', [
             'title'   => 'All Cheques',
-            'cheques' => Cheque::with(['client', 'bank'])->latest('id')->get(),
+            'cheques' => Cheque::with(['client', 'payee', 'bank'])->latest('id')->get(),
         ]);
     }
 
     public function create()
     {
+        $clients = Client::with('banks')->orderBy('company_name')->get();
+
         return view('cheques.create', [
             'title'   => 'New Cheque',
-            'clients' => Client::orderBy('company_name')->get(),
-            'banks'   => Bank::orderBy('bank_name')->get(),
+            'payees'  => Payee::orderBy('name')->get(),
+            'clients' => $clients,
+
+            // Banks linked to each company, for the dependent bank dropdown.
+            'companyBanks' => $clients->mapWithKeys(fn ($client) => [
+                $client->id => $client->banks->map(fn ($bank) => [
+                    'id'   => $bank->id,
+                    'name' => $bank->bank_name,
+                    'url'  => route('banks.next-cheque-number', ['bank' => $bank]),
+                ])->values(),
+            ]),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
+            'payee_id'    => ['required', 'exists:payees,id'],
             'client_id'   => ['required', 'exists:clients,id'],
             'bank_id'     => ['required', 'exists:banks,id'],
             'cheque_date' => ['required', 'date'],
             'memo'        => ['nullable', 'string', 'max:255'],
             'amount'      => ['required', 'numeric', 'min:0.01', 'max:999999999'],
         ]);
+
+        // The bank must be one of the banks linked to the selected company.
+        $client = Client::findOrFail($data['client_id']);
+
+        if (! $client->banks()->whereKey($data['bank_id'])->exists()) {
+            throw ValidationException::withMessages([
+                'bank_id' => 'The selected bank is not linked to this company.',
+            ]);
+        }
 
         $cheque = DB::transaction(function () use ($data) {
             $bank = Bank::lockForUpdate()->findOrFail($data['bank_id']);
@@ -70,6 +92,7 @@ class ChequeController extends Controller
 
             return Cheque::create([
                 'client_id'               => $data['client_id'],
+                'payee_id'                => $data['payee_id'],
                 'bank_id'                 => $bank->id,
                 'bank_cheque_sequence_id' => $sequence->id,
                 'cheque_number'           => $number,
@@ -92,7 +115,7 @@ class ChequeController extends Controller
 
     public function pdf(Cheque $cheque)
     {
-        $cheque->load(['client.bank', 'bank']);
+        $cheque->load(['client', 'payee', 'bank']);
 
         $html = view('cheques.pdf', ['cheque' => $cheque])->render();
 

@@ -12,14 +12,14 @@
                     @csrf
 
                     <div class="row mb-3">
-                        <label class="col-sm-2 col-form-label" for="client_id">Client <span class="text-danger">*</span></label>
+                        <label class="col-sm-2 col-form-label" for="payee_id">Payee <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
-                            <select class="select2 form-select" id="client_id" name="client_id" required>
-                                <option value="">Select Client</option>
-                                @foreach($clients as $client)
-                                    <option value="{{ $client->id }}"
-                                            {{ (string) old('client_id') === (string) $client->id ? 'selected' : '' }}>
-                                        {{ $client->company_name }} ({{ $client->payee_name }})
+                            <select class="select2 form-select" id="payee_id" name="payee_id" required>
+                                <option value="">Select Payee</option>
+                                @foreach($payees as $payee)
+                                    <option value="{{ $payee->id }}"
+                                            {{ (string) old('payee_id') === (string) $payee->id ? 'selected' : '' }}>
+                                        {{ $payee->name }}
                                     </option>
                                 @endforeach
                             </select>
@@ -27,11 +27,28 @@
                     </div>
 
                     <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label" for="client_id">Company <span class="text-danger">*</span></label>
+                        <div class="col-sm-10">
+                            <select class="select2 form-select" id="client_id" name="client_id" required>
+                                <option value="">Select Company</option>
+                                @foreach($clients as $client)
+                                    <option value="{{ $client->id }}"
+                                            {{ (string) old('client_id') === (string) $client->id ? 'selected' : '' }}>
+                                        {{ $client->company_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    @php($oldClient = $clients->firstWhere('id', (int) old('client_id')))
+
+                    <div class="row mb-3">
                         <label class="col-sm-2 col-form-label" for="bank_id">Bank <span class="text-danger">*</span></label>
                         <div class="col-sm-10">
                             <select class="select2 form-select" id="bank_id" name="bank_id" required>
                                 <option value="">Select Bank</option>
-                                @foreach($banks as $bank)
+                                @foreach($oldClient?->banks ?? [] as $bank)
                                     <option value="{{ $bank->id }}"
                                             data-next-url="{{ route('banks.next-cheque-number', ['bank' => $bank]) }}"
                                             {{ (string) old('bank_id') === (string) $bank->id ? 'selected' : '' }}>
@@ -39,6 +56,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <small class="text-muted">Only the banks linked to the selected company are listed.</small>
                         </div>
                     </div>
 
@@ -88,6 +106,26 @@
 
     @push('scripts')
         <script type="text/javascript">
+            // Banks linked to each company: { client_id: [ { id, name, url }, ... ] }
+            var company_banks = @json($companyBanks);
+
+            // Rebuild the bank dropdown with the selected company's banks.
+            function refresh_bank_options () {
+                var client_id = $ ( '#client_id' ).val ();
+                var banks     = company_banks[ client_id ] || [];
+                var select    = $ ( '#bank_id' );
+
+                select.empty ().append ( $ ( '<option>', { value: '', text: 'Select Bank' } ) );
+
+                $.each ( banks, function ( _, bank ) {
+                    select.append (
+                        $ ( '<option>', { value: bank.id, text: bank.name } ).attr ( 'data-next-url', bank.url )
+                    );
+                } );
+
+                select.val ( '' ).trigger ( 'change' );
+            }
+
             // Show the auto-picked next cheque number when a bank is selected.
             function refresh_next_cheque_number () {
                 var option = $ ( '#bank_id' ).find ( ':selected' );
@@ -109,6 +147,7 @@
                 } );
             }
 
+            $ ( '#client_id' ).on ( 'change', refresh_bank_options );
             $ ( '#bank_id' ).on ( 'change', refresh_next_cheque_number );
             $ ( refresh_next_cheque_number );
         </script>

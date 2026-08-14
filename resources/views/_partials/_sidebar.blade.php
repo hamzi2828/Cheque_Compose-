@@ -36,21 +36,41 @@
             </ul>
         </li>
 
-        <!-- Clients -->
+        <!-- Companies -->
         <li class="menu-item {{ request()->routeIs('clients.*') ? 'active open' : '' }}">
             <a class="menu-link menu-toggle" href="javascript:void(0)">
-                <i class="menu-icon tf-icons ti ti-users"></i>
-                <div data-i18n="Clients">Clients</div>
+                <i class="menu-icon tf-icons ti ti-building"></i>
+                <div data-i18n="Companies">Companies</div>
             </a>
             <ul class="menu-sub">
                 <li class="menu-item {{ request()->routeIs('clients.index') ? 'active' : '' }}">
                     <a class="menu-link" href="{{ route('clients.index') }}">
-                        <div data-i18n="All Clients">All Clients</div>
+                        <div data-i18n="All Companies">All Companies</div>
                     </a>
                 </li>
                 <li class="menu-item {{ request()->routeIs('clients.create') ? 'active' : '' }}">
                     <a class="menu-link" href="{{ route('clients.create') }}">
-                        <div data-i18n="Add Client">Add Client</div>
+                        <div data-i18n="Add Company">Add Company</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        <!-- Payees -->
+        <li class="menu-item {{ request()->routeIs('payees.*') ? 'active open' : '' }}">
+            <a class="menu-link menu-toggle" href="javascript:void(0)">
+                <i class="menu-icon tf-icons ti ti-users"></i>
+                <div data-i18n="Payees">Payees</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('payees.index') ? 'active' : '' }}">
+                    <a class="menu-link" href="{{ route('payees.index') }}">
+                        <div data-i18n="All Payees">All Payees</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('payees.create') ? 'active' : '' }}">
+                    <a class="menu-link" href="{{ route('payees.create') }}">
+                        <div data-i18n="Add Payee">Add Payee</div>
                     </a>
                 </li>
             </ul>
@@ -74,6 +94,14 @@
                     </a>
                 </li>
             </ul>
+        </li>
+
+        <!-- Settings -->
+        <li class="menu-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+            <a class="menu-link" href="{{ route('settings.create') }}">
+                <i class="menu-icon tf-icons ti ti-settings"></i>
+                <div data-i18n="Settings">Settings</div>
+            </a>
         </li>
 
     </ul>

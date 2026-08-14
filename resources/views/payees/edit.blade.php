@@ -1,0 +1,28 @@
+<x-dashboard :title="$title">
+    <!-- Content -->
+    <div class="container-p-x flex-grow-1 container-p-y">
+        @include('_partials.errors.validation-errors')
+
+        <div class="card mb-4">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="mb-0">{{ $title }} - {{ $payee->name }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{ route('payees.update', ['payee' => $payee]) }}">
+                    @csrf
+                    @method('PUT')
+
+                    @include('payees._form', ['payee' => $payee])
+
+                    <div class="row justify-content-end mt-4">
+                        <div class="col-sm-10">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <a href="{{ route('payees.index') }}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- / Content -->
+</x-dashboard>

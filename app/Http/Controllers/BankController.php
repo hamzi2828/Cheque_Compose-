@@ -125,15 +125,15 @@ class BankController extends Controller
     private function validateBank(Request $request): array
     {
         return $request->validate([
-            'bank_name'      => ['required', 'string', 'max:255'],
-            'address_1'      => ['nullable', 'string', 'max:255'],
-            'address_2'      => ['nullable', 'string', 'max:255'],
-            'city'           => ['nullable', 'string', 'max:255'],
-            'state'          => ['nullable', 'string', 'max:255'],
-            'zip_code'       => ['nullable', 'string', 'max:32'],
-            'phone'          => ['nullable', 'string', 'max:64'],
-            'routing_number' => ['required', 'string', 'max:32'],
-            'fraction'       => ['nullable', 'string', 'max:64'],
+            'bank_name'           => ['required', 'string', 'max:255'],
+            'address_1'           => ['nullable', 'string', 'max:255'],
+            'address_2'           => ['nullable', 'string', 'max:255'],
+            'city'                => ['nullable', 'string', 'max:255'],
+            'state'               => ['nullable', 'string', 'max:255'],
+            'zip_code'            => ['nullable', 'string', 'max:32'],
+            'phone'               => ['nullable', 'string', 'max:64'],
+            'routing_number'      => ['required', 'string', 'max:32'],
+            'bank_account_number' => ['nullable', 'string', 'max:64'],
         ]);
     }
 

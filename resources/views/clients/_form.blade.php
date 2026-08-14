@@ -82,33 +82,23 @@
     </div>
 </div>
 
-<div class="row mb-3">
-    <label class="col-sm-2 col-form-label" for="payee_name">Payee Name <span class="text-danger">*</span></label>
-    <div class="col-sm-10">
-        <input type="text" class="form-control" id="payee_name" name="payee_name"
-               value="{{ old('payee_name', $client->payee_name ?? '') }}" required />
-    </div>
-</div>
+@php
+    $selectedBankIds = collect(old('bank_ids', $client?->banks->pluck('id')->all() ?? []))
+        ->map(fn ($id) => (string) $id)
+        ->all();
+@endphp
 
 <div class="row mb-3">
-    <label class="col-sm-2 col-form-label" for="bank_id">Client Bank</label>
+    <label class="col-sm-2 col-form-label" for="bank_ids">Bank</label>
     <div class="col-sm-10">
-        <select class="select2 form-select" id="bank_id" name="bank_id">
-            <option value="">Select Bank</option>
+        <select class="select2 form-select" id="bank_ids" name="bank_ids[]" multiple>
             @foreach($banks as $bank)
                 <option value="{{ $bank->id }}"
-                        {{ (string) old('bank_id', $client->bank_id ?? '') === (string) $bank->id ? 'selected' : '' }}>
+                        {{ in_array((string) $bank->id, $selectedBankIds, true) ? 'selected' : '' }}>
                     {{ $bank->bank_name }}
                 </option>
             @endforeach
         </select>
-    </div>
-</div>
-
-<div class="row mb-3">
-    <label class="col-sm-2 col-form-label" for="bank_account_number">Bank Account #</label>
-    <div class="col-sm-10">
-        <input type="text" class="form-control" id="bank_account_number" name="bank_account_number"
-               value="{{ old('bank_account_number', $client->bank_account_number ?? '') }}" />
+        <small class="text-muted">The banks selected here become available when composing a cheque for this company.</small>
     </div>
 </div>

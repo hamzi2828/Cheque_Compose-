@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Client extends Model
@@ -19,14 +19,11 @@ class Client extends Model
         'phone',
         'email',
         'notes',
-        'payee_name',
-        'bank_id',
-        'bank_account_number',
     ];
 
-    public function bank(): BelongsTo
+    public function banks(): BelongsToMany
     {
-        return $this->belongsTo(Bank::class);
+        return $this->belongsToMany(Bank::class)->orderBy('bank_name');
     }
 
     public function cheques(): HasMany
