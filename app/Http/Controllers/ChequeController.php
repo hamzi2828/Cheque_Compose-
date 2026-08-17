@@ -124,8 +124,11 @@ class ChequeController extends Controller
 
         $mpdf = new Mpdf([
             'format'        => 'A4',
-            'margin_top'    => 8,
-            'margin_bottom' => 8,
+            // No vertical margin: the blade lays the three copies out at 0/99/198mm so
+            // each one starts on a perforation of the cheque stock. Top spacing lives in
+            // the blocks' own padding-top.
+            'margin_top'    => 0,
+            'margin_bottom' => 0,
             'margin_left'   => 10,
             'margin_right'  => 10,
             'tempDir'       => storage_path('app/mpdf'),

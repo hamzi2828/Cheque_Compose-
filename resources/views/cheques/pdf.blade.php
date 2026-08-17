@@ -13,7 +13,9 @@
 
     // MICR E-13B line (micrenc font): C = on-us, A = transit.
     // Cheque number gets two leading zeros, e.g. 1709 -> 001709.
-    $micr = 'C00' . $chequeNo . 'C  A' . $bank->routing_number . 'A  ' . ($bank->bank_account_number ?: '') . 'C';
+    // Field gap: non-breaking spaces, since mPDF collapses runs of ordinary spaces to one.
+    $micrGap = str_repeat("\u{00A0}", 3);
+    $micr = 'C00' . $chequeNo . 'C' . $micrGap . 'A' . $bank->routing_number . 'A' . $micrGap . ($bank->bank_account_number ?: '') . 'C';
 
     $clientCityLine = trim(implode(', ', array_filter([$client->city, $client->state])) . ' ' . $client->zip_code);
     $bankCityLine   = trim(implode(', ', array_filter([$bank->city, $bank->state])) . ' ' . $bank->zip_code);
@@ -29,7 +31,14 @@
             color: #000;
         }
 
-        .cheque-block { height: 88mm; }
+        /* One block per perforated section of the cheque stock: A4 297mm / 3 = 99mm.
+           The page has no top/bottom margin so section 1 starts at the paper edge and
+           sections 2 and 3 start exactly on a perforation. The last block is left to
+           flow, so 3 x 99mm can never round over the page height onto a second page.
+           Heights exclude padding, so height + padding-top must add up to 99mm. */
+        .cheque-block      { height: 93mm; padding-top: 6mm; }
+        .cheque-block-pay  { height: 91mm; padding-top: 8mm; }
+        .cheque-block-last { height: auto; }
 
         .notice-heading {
             font-size: 21pt;
@@ -52,7 +61,6 @@
         .party-name   { font-weight: bold; font-size: 10.5pt; }
 
         .cheque-no    { font-size: 13pt; font-weight: bold; text-align: right; }
-        .fraction     { font-size: 8pt; text-align: right; }
         .cheque-date  { font-size: 10pt; text-align: right; margin-top: 2.5mm; }
 
         .pay-line     { margin-top: 8mm; font-size: 10pt; }
@@ -84,7 +92,7 @@
 
         .micr {
             font-family: micrenc;
-            font-size: 13pt;
+            font-size: 17pt;
             margin-top: 6mm;
         }
 
@@ -105,7 +113,7 @@
 ] as $copy)
     @php($isCheque = $copy['heading'] === null)
 
-    <div class="cheque-block">
+    <div class="{{ trim('cheque-block ' . ($isCheque ? 'cheque-block-pay ' : '') . ($loop->last ? 'cheque-block-last' : '')) }}">
         @if($copy['heading'])
             <div class="notice-heading">{{ $copy['heading'] }}</div>
             <div class="notice-subheading">{{ $copy['subheading'] }}</div>
@@ -130,9 +138,6 @@
                 </td>
                 <td width="22%">
                     <div class="cheque-no">{{ $chequeNo }}</div>
-                    @if($bank->bank_account_number)
-                        <div class="fraction">{{ $bank->bank_account_number }}</div>
-                    @endif
                     <div class="cheque-date">{{ $cheque->cheque_date->format('m/d/Y') }}</div>
                 </td>
             </tr>
